@@ -1,0 +1,16 @@
+{
+  "name": "@agent-mail/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsp compile .",
+    "watch": "tsp compile . --watch"
+  },
+  "dependencies": {
+    "@typespec/compiler": "^1.13.0",
+    "@typespec/http": "^1.13.0",
+    "@typespec/rest": "^0.83.0",
+    "@typespec/openapi3": "^1.13.0"
+  }
+}

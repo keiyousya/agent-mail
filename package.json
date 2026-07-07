@@ -1,0 +1,14 @@
+{
+  "name": "agent-mail",
+  "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  },
+  "scripts": {
+    "dev": "pnpm --filter @agent-mail/server dev & pnpm --filter @agent-mail/web dev",
+    "dev:server": "pnpm --filter @agent-mail/server dev",
+    "dev:web": "pnpm --filter @agent-mail/web dev",
+    "build": "pnpm --filter @agent-mail/web build",
+    "typespec": "pnpm --filter @agent-mail/api build"
+  }
+}
