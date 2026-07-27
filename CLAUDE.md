@@ -13,7 +13,7 @@
 ## External Services
 
 - **医療機関等ONS**: vendorons.service-now.com にベンダー登録済み。オンライン資格確認・電子処方箋関連の情報を受信している。
-- **ORCA**: 日医標準レセプトソフトORCAと連携するシステムとして開発中。日医IT認定事業所の取得に向けて準備中。
+- **ORCA**: 日医標準レセプトソフトORCAと連携するシステムとして開発中。日医IT認定事業所の取得に向けて準備中。HAORI API協議会への参加も検討中。
 - **Google Cloud**: プロジェクト `tamurakeito-fc9e7` を使用。Gmail MCP API 有効化済み。
 - **Gmail MCP**: claude.ai Connectors 経由で接続。OAuthクライアントはプロジェクト tamurakeito-fc9e7 に作成済み。
 
