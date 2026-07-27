@@ -21,8 +21,8 @@ server.tool(
   "指定メールボックスのメール一覧を取得する",
   {
     mailboxPath: z.string().default("INBOX").describe("メールボックスのパス"),
-    page: z.number().default(1).describe("ページ番号"),
-    limit: z.number().default(20).describe("1ページあたりの件数"),
+    page: z.coerce.number().default(1).describe("ページ番号"),
+    limit: z.coerce.number().default(20).describe("1ページあたりの件数"),
   },
   async ({ mailboxPath, page, limit }) => {
     const result = await imap.listMessages(mailboxPath, page, limit);
@@ -35,7 +35,7 @@ server.tool(
   "メールの本文を取得する",
   {
     mailboxPath: z.string().describe("メールボックスのパス"),
-    uid: z.number().describe("メールのUID"),
+    uid: z.coerce.number().describe("メールのUID"),
   },
   async ({ mailboxPath, uid }) => {
     const msg = await imap.getMessage(mailboxPath, uid);
@@ -81,7 +81,7 @@ server.tool(
   "メールのフラグを更新する（既読・フラグ等）",
   {
     mailboxPath: z.string().describe("メールボックスのパス"),
-    uid: z.number().describe("メールのUID"),
+    uid: z.coerce.number().describe("メールのUID"),
     addFlags: z.array(z.string()).optional().describe("追加するフラグ"),
     removeFlags: z.array(z.string()).optional().describe("削除するフラグ"),
   },
@@ -96,7 +96,7 @@ server.tool(
   "メールを別のメールボックスに移動する",
   {
     mailboxPath: z.string().describe("現在のメールボックスのパス"),
-    uid: z.number().describe("メールのUID"),
+    uid: z.coerce.number().describe("メールのUID"),
     destination: z.string().describe("移動先のメールボックスのパス"),
   },
   async ({ mailboxPath, uid, destination }) => {
@@ -110,7 +110,7 @@ server.tool(
   "メールを削除する",
   {
     mailboxPath: z.string().describe("メールボックスのパス"),
-    uid: z.number().describe("メールのUID"),
+    uid: z.coerce.number().describe("メールのUID"),
   },
   async ({ mailboxPath, uid }) => {
     await imap.deleteMessage(mailboxPath, uid);
