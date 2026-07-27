@@ -5,23 +5,25 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "mcp": "tsx src/mcp.ts",
     "start": "node dist/index.js",
     "build": "tsc"
   },
   "dependencies": {
-    "hono": "^4.7.0",
     "@hono/node-server": "^1.13.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^16.4.0",
+    "hono": "^4.7.0",
     "imapflow": "^1.0.170",
-    "nodemailer": "^6.10.0",
     "mailparser": "^3.7.0",
+    "nodemailer": "^6.10.0",
     "sanitize-html": "^2.14.0",
-    "zod": "^3.24.0",
-    "dotenv": "^16.4.0"
+    "zod": "^3.24.0"
   },
   "devDependencies": {
-    "tsx": "^4.19.0",
-    "typescript": "^5.7.0",
     "@types/nodemailer": "^6.4.0",
-    "@types/sanitize-html": "^2.13.0"
+    "@types/sanitize-html": "^2.13.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
   }
 }
