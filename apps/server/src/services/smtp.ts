@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 export async function sendMail(
   request: ComposeRequest
 ): Promise<{ messageId: string }> {
-  const mailOptions = {
+  const mailOptions: Record<string, any> = {
     from: env.SMTP_USER,
     to: request.to.join(", "),
     cc: request.cc?.join(", "),
@@ -29,6 +29,13 @@ export async function sendMail(
     html: request.html,
     inReplyTo: request.inReplyTo,
     references: request.references?.join(" "),
+    attachments: request.attachments?.map((a) => ({
+      filename: a.filename,
+      path: a.path,
+      content: a.content,
+      contentType: a.contentType,
+      encoding: a.encoding,
+    })),
   };
 
   const info = await transporter.sendMail(mailOptions);
@@ -42,6 +49,32 @@ export async function sendMail(
   }
 
   return { messageId: info.messageId };
+}
+
+export async function saveDraft(
+  request: ComposeRequest
+): Promise<void> {
+  const mailOptions: Record<string, any> = {
+    from: env.SMTP_USER,
+    to: request.to.join(", "),
+    cc: request.cc?.join(", "),
+    bcc: request.bcc?.join(", "),
+    subject: request.subject,
+    text: request.text,
+    html: request.html,
+    inReplyTo: request.inReplyTo,
+    references: request.references?.join(" "),
+    attachments: request.attachments?.map((a) => ({
+      filename: a.filename,
+      path: a.path,
+      content: a.content,
+      contentType: a.contentType,
+      encoding: a.encoding,
+    })),
+  };
+
+  const rawMessage = await buildRawMessage(mailOptions);
+  await imapService.appendToDrafts(rawMessage);
 }
 
 async function buildRawMessage(options: Record<string, any>): Promise<string> {

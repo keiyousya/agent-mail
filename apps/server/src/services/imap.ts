@@ -357,6 +357,21 @@ export class ImapService {
     });
   }
 
+  async appendToDrafts(rawMessage: Buffer | string): Promise<void> {
+    return this.enqueue(async (client) => {
+      const draftFolders = ["INBOX.Drafts", "INBOX.Draft"];
+      for (const folder of draftFolders) {
+        try {
+          await client.append(folder, rawMessage, ["\\Draft", "\\Seen"]);
+          return;
+        } catch {
+          // Try next folder
+        }
+      }
+      console.warn("Could not append to any Drafts folder");
+    });
+  }
+
   async disconnect(): Promise<void> {
     if (this.client) {
       await this.client.logout();

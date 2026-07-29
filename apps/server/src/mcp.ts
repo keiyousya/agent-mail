@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { ImapService } from "./services/imap.js";
-import { sendMail } from "./services/smtp.js";
+import { sendMail, saveDraft } from "./services/smtp.js";
 
 const imap = new ImapService();
 
@@ -69,10 +69,43 @@ server.tool(
     bcc: z.array(z.string()).optional().describe("BCC"),
     inReplyTo: z.string().optional().describe("返信先のMessage-ID"),
     references: z.array(z.string()).optional().describe("参照Message-ID"),
+    attachments: z.array(z.object({
+      filename: z.string().describe("ファイル名"),
+      path: z.string().optional().describe("ファイルパス"),
+      content: z.string().optional().describe("Base64エンコードされた内容"),
+      contentType: z.string().optional().describe("MIMEタイプ"),
+      encoding: z.string().optional().describe("エンコーディング（例: base64）"),
+    })).optional().describe("添付ファイル"),
   },
   async (params) => {
     const result = await sendMail(params);
     return { content: [{ type: "text", text: `送信完了: ${result.messageId}` }] };
+  }
+);
+
+server.tool(
+  "save_draft",
+  "メールの下書きを保存する",
+  {
+    to: z.array(z.string()).describe("宛先メールアドレス"),
+    subject: z.string().describe("件名"),
+    text: z.string().optional().describe("本文（テキスト）"),
+    html: z.string().optional().describe("本文（HTML）"),
+    cc: z.array(z.string()).optional().describe("CC"),
+    bcc: z.array(z.string()).optional().describe("BCC"),
+    inReplyTo: z.string().optional().describe("返信先のMessage-ID"),
+    references: z.array(z.string()).optional().describe("参照Message-ID"),
+    attachments: z.array(z.object({
+      filename: z.string().describe("ファイル名"),
+      path: z.string().optional().describe("ファイルパス"),
+      content: z.string().optional().describe("Base64エンコードされた内容"),
+      contentType: z.string().optional().describe("MIMEタイプ"),
+      encoding: z.string().optional().describe("エンコーディング（例: base64）"),
+    })).optional().describe("添付ファイル"),
+  },
+  async (params) => {
+    await saveDraft(params);
+    return { content: [{ type: "text", text: "下書きを保存しました" }] };
   }
 );
 

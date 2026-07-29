@@ -39,6 +39,14 @@ export interface MessagePatch {
   moveTo?: string;
 }
 
+export interface ComposeAttachment {
+  filename: string;
+  path?: string;
+  content?: string;
+  contentType?: string;
+  encoding?: string;
+}
+
 export interface ComposeRequest {
   to: string[];
   cc?: string[];
@@ -48,6 +56,7 @@ export interface ComposeRequest {
   html?: string;
   inReplyTo?: string;
   references?: string[];
+  attachments?: ComposeAttachment[];
 }
 
 export interface Mailbox {
