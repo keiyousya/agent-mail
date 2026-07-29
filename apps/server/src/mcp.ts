@@ -76,6 +76,8 @@ server.tool(
       contentType: z.string().optional().describe("MIMEタイプ"),
       encoding: z.string().optional().describe("エンコーディング（例: base64）"),
     })).optional().describe("添付ファイル"),
+    draftFolder: z.string().optional().describe("送信元の下書きフォルダ（下書きから送信時に自動削除）"),
+    draftUid: z.coerce.number().optional().describe("送信元の下書きUID（下書きから送信時に自動削除）"),
   },
   async (params) => {
     const result = await sendMail(params);
@@ -85,7 +87,7 @@ server.tool(
 
 server.tool(
   "save_draft",
-  "メールの下書きを保存する",
+  "メールの下書きを保存する。保存後にUID・フォルダを返すので、send_mailのdraftFolder/draftUidに渡すと送信時に下書きが自動削除される",
   {
     to: z.array(z.string()).describe("宛先メールアドレス"),
     subject: z.string().describe("件名"),
@@ -104,8 +106,11 @@ server.tool(
     })).optional().describe("添付ファイル"),
   },
   async (params) => {
-    await saveDraft(params);
-    return { content: [{ type: "text", text: "下書きを保存しました" }] };
+    const result = await saveDraft(params);
+    if (result) {
+      return { content: [{ type: "text", text: `下書きを保存しました (folder: ${result.folder}, uid: ${result.uid})` }] };
+    }
+    return { content: [{ type: "text", text: "下書きの保存に失敗しました" }] };
   }
 );
 

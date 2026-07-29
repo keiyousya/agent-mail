@@ -357,18 +357,31 @@ export class ImapService {
     });
   }
 
-  async appendToDrafts(rawMessage: Buffer | string): Promise<void> {
+  async appendToDrafts(rawMessage: Buffer | string): Promise<{ uid: number; folder: string } | null> {
     return this.enqueue(async (client) => {
       const draftFolders = ["INBOX.Drafts", "INBOX.Draft"];
       for (const folder of draftFolders) {
         try {
-          await client.append(folder, rawMessage, ["\\Draft", "\\Seen"]);
-          return;
+          const result = await client.append(folder, rawMessage, ["\\Draft", "\\Seen"]);
+          return { uid: result.uid, folder };
         } catch {
           // Try next folder
         }
       }
       console.warn("Could not append to any Drafts folder");
+      return null;
+    });
+  }
+
+  async deleteDraft(folder: string, uid: number): Promise<void> {
+    return this.enqueue(async (client) => {
+      const lock = await client.getMailboxLock(folder);
+      try {
+        await client.messageFlagsAdd(String(uid), ["\\Deleted"], { uid: true });
+        await client.messageDelete(String(uid), { uid: true });
+      } finally {
+        lock.release();
+      }
     });
   }
 

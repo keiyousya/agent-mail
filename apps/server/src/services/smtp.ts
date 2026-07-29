@@ -16,27 +16,15 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+interface SendMailOptions extends ComposeRequest {
+  draftFolder?: string;
+  draftUid?: number;
+}
+
 export async function sendMail(
-  request: ComposeRequest
+  request: SendMailOptions
 ): Promise<{ messageId: string }> {
-  const mailOptions: Record<string, any> = {
-    from: env.SMTP_USER,
-    to: request.to.join(", "),
-    cc: request.cc?.join(", "),
-    bcc: request.bcc?.join(", "),
-    subject: request.subject,
-    text: request.text,
-    html: request.html,
-    inReplyTo: request.inReplyTo,
-    references: request.references?.join(" "),
-    attachments: request.attachments?.map((a) => ({
-      filename: a.filename,
-      path: a.path,
-      content: a.content,
-      contentType: a.contentType,
-      encoding: a.encoding,
-    })),
-  };
+  const mailOptions = buildMailOptions(request);
 
   const info = await transporter.sendMail(mailOptions);
 
@@ -48,13 +36,28 @@ export async function sendMail(
     console.error("Failed to save to Sent folder:", err);
   }
 
+  // Delete draft if sent from a saved draft
+  if (request.draftFolder && request.draftUid) {
+    try {
+      await imapService.deleteDraft(request.draftFolder, request.draftUid);
+    } catch (err) {
+      console.error("Failed to delete draft:", err);
+    }
+  }
+
   return { messageId: info.messageId };
 }
 
 export async function saveDraft(
   request: ComposeRequest
-): Promise<void> {
-  const mailOptions: Record<string, any> = {
+): Promise<{ uid: number; folder: string } | null> {
+  const mailOptions = buildMailOptions(request);
+  const rawMessage = await buildRawMessage(mailOptions);
+  return await imapService.appendToDrafts(rawMessage);
+}
+
+function buildMailOptions(request: ComposeRequest): Record<string, any> {
+  return {
     from: env.SMTP_USER,
     to: request.to.join(", "),
     cc: request.cc?.join(", "),
@@ -72,9 +75,6 @@ export async function saveDraft(
       encoding: a.encoding,
     })),
   };
-
-  const rawMessage = await buildRawMessage(mailOptions);
-  await imapService.appendToDrafts(rawMessage);
 }
 
 async function buildRawMessage(options: Record<string, any>): Promise<string> {
