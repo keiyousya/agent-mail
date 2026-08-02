@@ -10,4 +10,3 @@ type: user
 - 日医IT認定事業所の取得に向けて準備中（JSMA医科医療事務管理士の受験要件を確認済み）
 - 医療機関等ONS（vendorons.service-now.com）にベンダー登録済み
 - npmのサプライチェーン攻撃を気にするセキュリティ意識がある
-- メールアドレス: tamurakeito@keiyousya.com

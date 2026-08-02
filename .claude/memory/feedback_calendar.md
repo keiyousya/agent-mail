@@ -5,7 +5,7 @@ type: feedback
 ---
 
 カレンダー予定は常に「家族」カレンダーに作成する。
-calendarId: family08116150111335324801@group.calendar.google.com
+calendarIdはlist_calendarsで「家族」という名前から解決する。
 
 **Why:** 妻と予定共有するため。
 
