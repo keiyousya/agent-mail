@@ -1,0 +1,5 @@
+- [田村慧人のプロフィール](user_profile.md) — 慧陽社代表、医療機関向け診療支援システムを開発
+- [メール文体ルール](feedback_email_style.md) — 下書き作成時の宛名・本文・結び・署名のスタイル
+- [カレンダーは「家族」に登録](feedback_calendar.md) — 予定作成時は必ず家族カレンダーのcalendarIdを指定
+- [医療DX事業の現状](project_medical_system.md) — ORCA連携開発、ONS登録、検証環境の取得状況
+- [ONS・ORCA関連の外部リソース](reference_ons.md) — ポータルURL、問い合わせ先メールアドレス
