@@ -21,4 +21,12 @@ specialUseフラグと実際の運用フォルダがずれている。フラグ�
 - ゴミ箱: `INBOX.Deleted Messages`（`\Trash`）
 - 下書き: `INBOX.Draft`（`\Drafts`）と `INBOX.Drafts` の両方が存在する
 
-関連: [[feedback_email_style]]
+### send_mail で返信するとき
+
+- `inReplyTo` / `references` には Message-ID を生の `<...>` 形式で渡す。
+  山括弧をHTML実体参照（`&lt;` `&gt;`）にしないこと。2026-08-03の送信で
+  `inReplyTo` をエスケープしたまま渡し、ヘッダが壊れた。
+- 返信済みかどうかは `INBOX.Sent Messages` の照合と、元メールの `\Answered`
+  フラグの両方で確認する。
+
+関連: [[feedback_email_style]]、[[feedback_mcp_reconnect]]
