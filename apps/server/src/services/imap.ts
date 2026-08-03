@@ -119,9 +119,10 @@ export class ImapService {
       const results: Mailbox[] = [];
 
       const walk = (folders: typeof tree.folders) => {
-        for (const folder of folders) {
+        for (const folder of folders ?? []) {
+          if (!folder.path) continue;
           results.push({
-            name: folder.name,
+            name: folder.name ?? folder.path,
             path: folder.path,
             delimiter: folder.delimiter || "/",
             flags: Array.from(folder.flags || []),
@@ -187,12 +188,12 @@ export class ImapService {
           const e = msg.envelope;
           messages.push({
             uid: msg.uid,
-            messageId: e.messageId || undefined,
-            subject: e.subject || undefined,
-            from: toAddressFromEnvelope(e.from),
-            to: toAddressFromEnvelope(e.to),
-            cc: e.cc ? toAddressFromEnvelope(e.cc) : undefined,
-            date: e.date ? new Date(e.date).toISOString() : undefined,
+            messageId: e?.messageId || undefined,
+            subject: e?.subject || undefined,
+            from: toAddressFromEnvelope(e?.from),
+            to: toAddressFromEnvelope(e?.to),
+            cc: e?.cc ? toAddressFromEnvelope(e.cc) : undefined,
+            date: e?.date ? new Date(e.date).toISOString() : undefined,
             preview: "",
             flags: Array.from(msg.flags || []),
             hasAttachments: hasAttachmentParts(msg.bodyStructure),
@@ -225,21 +226,21 @@ export class ImapService {
           { uid: true }
         );
 
-        if (!msg?.source) return null;
+        if (!msg || !msg.source) return null;
 
         const parsed = await simpleParser(msg.source);
         const e = msg.envelope;
 
         return {
           uid: msg.uid,
-          messageId: e.messageId || undefined,
-          subject: e.subject || undefined,
-          from: toAddressFromEnvelope(e.from),
-          to: toAddressFromEnvelope(e.to),
-          cc: e.cc ? toAddressFromEnvelope(e.cc) : undefined,
-          bcc: e.bcc ? toAddressFromEnvelope(e.bcc) : undefined,
-          replyTo: e.replyTo ? toAddressFromEnvelope(e.replyTo) : undefined,
-          date: e.date ? new Date(e.date).toISOString() : undefined,
+          messageId: e?.messageId || undefined,
+          subject: e?.subject || undefined,
+          from: toAddressFromEnvelope(e?.from),
+          to: toAddressFromEnvelope(e?.to),
+          cc: e?.cc ? toAddressFromEnvelope(e.cc) : undefined,
+          bcc: e?.bcc ? toAddressFromEnvelope(e.bcc) : undefined,
+          replyTo: e?.replyTo ? toAddressFromEnvelope(e.replyTo) : undefined,
+          date: e?.date ? new Date(e.date).toISOString() : undefined,
           preview: (parsed.text || "").slice(0, 200),
           flags: Array.from(msg.flags || []),
           hasAttachments: (parsed.attachments?.length || 0) > 0,
@@ -344,10 +345,11 @@ export class ImapService {
     return this.enqueue(async (client) => {
       const lock = await client.getMailboxLock(mailboxPath);
       try {
-        const uids = await client.search(
-          { or: [{ subject: query }, { from: query }, { body: query }] },
-          { uid: true }
-        );
+        const uids =
+          (await client.search(
+            { or: [{ subject: query }, { from: query }, { body: query }] },
+            { uid: true }
+          )) || [];
 
         if (uids.length === 0) return [];
 
@@ -363,11 +365,11 @@ export class ImapService {
           const e = msg.envelope;
           results.push({
             uid: msg.uid,
-            messageId: e.messageId || undefined,
-            subject: e.subject || undefined,
-            from: toAddressFromEnvelope(e.from),
-            to: toAddressFromEnvelope(e.to),
-            date: e.date ? new Date(e.date).toISOString() : undefined,
+            messageId: e?.messageId || undefined,
+            subject: e?.subject || undefined,
+            from: toAddressFromEnvelope(e?.from),
+            to: toAddressFromEnvelope(e?.to),
+            date: e?.date ? new Date(e.date).toISOString() : undefined,
             preview: "",
             flags: Array.from(msg.flags || []),
             hasAttachments: hasAttachmentParts(msg.bodyStructure),
@@ -423,7 +425,9 @@ export class ImapService {
       for (const folder of draftFolders) {
         try {
           const result = await client.append(folder, rawMessage, ["\\Draft", "\\Seen"]);
-          return { uid: result.uid, folder };
+          if (result && result.uid !== undefined) {
+            return { uid: result.uid, folder };
+          }
         } catch {
           // Try next folder
         }
