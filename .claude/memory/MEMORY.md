@@ -4,3 +4,5 @@
 - [医療DX事業の現状](project_medical_system.md) — ORCA連携開発、ONS登録、検証環境の取得状況
 - [ONS・ORCA関連の外部リソース](reference_ons.md) — ポータル・厚労省・ORCAの各URL
 - [メモリに書かない情報](feedback_memory_policy.md) — メールアドレス等の連絡先はメモリに残さない
+- [2つのメールボックスの使い分け](reference_mailboxes.md) — 慧陽社はGmail、クリニックはsakura-mail MCP
+- [メディカルドック掲載の進行状況](project_medicaldoc.md) — 完了確認書の送付が未了
