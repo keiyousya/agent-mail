@@ -6,3 +6,4 @@
 - [メモリに書かない情報](feedback_memory_policy.md) — メールアドレス等の連絡先はメモリに残さない
 - [2つのメールボックスの使い分け](reference_mailboxes.md) — 慧陽社はGmail、クリニックはsakura-mail MCP
 - [メディカルドック掲載の進行状況](project_medicaldoc.md) — 完了確認書の送付が未了
+- [MCP切断時は再接続を促す](feedback_mcp_reconnect.md) — sakura-mailが切れたら迂回せず/mcpを依頼
