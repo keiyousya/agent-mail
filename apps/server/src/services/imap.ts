@@ -19,15 +19,29 @@ function toAddressFromEnvelope(
   }));
 }
 
+// Ping the server well inside the usual IMAP idle timeout (30 min) so the
+// pooled connection is not dropped between tool calls.
+const KEEPALIVE_INTERVAL_MS = 4 * 60 * 1000;
+
 export class ImapService {
   private client: ImapFlow | null = null;
   private queue: Promise<unknown> = Promise.resolve();
+  private keepaliveTimer: NodeJS.Timeout | null = null;
 
   // Serialize all IMAP operations to prevent concurrent access
   private enqueue<T>(fn: (client: ImapFlow) => Promise<T>): Promise<T> {
     const task = this.queue.then(async () => {
-      const client = await this.getClient();
-      return fn(client);
+      try {
+        const client = await this.getClient();
+        return await fn(client);
+      } catch (err) {
+        // If the connection is still usable this is a genuine failure
+        // (missing mailbox, bad UID, ...) and retrying would not help.
+        if (this.client?.usable) throw err;
+        this.resetClient();
+        const client = await this.getClient();
+        return await fn(client);
+      }
     });
     this.queue = task.catch(() => {});
     return task;
@@ -35,10 +49,10 @@ export class ImapService {
 
   private async getClient(): Promise<ImapFlow> {
     if (this.client && !this.client.usable) {
-      this.client = null;
+      this.resetClient();
     }
     if (!this.client) {
-      this.client = new ImapFlow({
+      const client = new ImapFlow({
         host: env.IMAP_HOST,
         port: env.IMAP_PORT,
         secure: true,
@@ -48,9 +62,55 @@ export class ImapService {
         },
         logger: false,
       });
-      await this.client.connect();
+      // Without these listeners an emitted 'error' would take down the process
+      client.on("error", (err) => {
+        console.error("IMAP connection error:", err);
+      });
+      client.on("close", () => {
+        if (this.client === client) {
+          this.stopKeepalive();
+          this.client = null;
+        }
+      });
+      this.client = client;
+      await client.connect();
+      this.startKeepalive();
     }
     return this.client;
+  }
+
+  private startKeepalive(): void {
+    this.stopKeepalive();
+    this.keepaliveTimer = setInterval(() => {
+      const client = this.client;
+      if (!client?.usable) return;
+      client.noop().catch((err) => {
+        console.error("IMAP keepalive failed:", err);
+      });
+    }, KEEPALIVE_INTERVAL_MS);
+    // Do not hold the process open just for the keepalive
+    this.keepaliveTimer.unref();
+  }
+
+  private stopKeepalive(): void {
+    if (this.keepaliveTimer) {
+      clearInterval(this.keepaliveTimer);
+      this.keepaliveTimer = null;
+    }
+  }
+
+  private resetClient(): void {
+    const client = this.client;
+    this.stopKeepalive();
+    this.client = null;
+    if (client) {
+      client.removeAllListeners("close");
+      try {
+        client.close();
+      } catch {
+        // Already gone
+      }
+    }
   }
 
   async listMailboxes(): Promise<Mailbox[]> {
@@ -386,9 +446,12 @@ export class ImapService {
   }
 
   async disconnect(): Promise<void> {
-    if (this.client) {
-      await this.client.logout();
-      this.client = null;
+    const client = this.client;
+    this.stopKeepalive();
+    this.client = null;
+    if (client) {
+      client.removeAllListeners("close");
+      await client.logout().catch(() => {});
     }
   }
 }
