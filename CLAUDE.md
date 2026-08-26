@@ -17,6 +17,13 @@
 - **Google Cloud**: プロジェクト `tamurakeito-fc9e7` を使用。Gmail MCP API 有効化済み。
 - **Gmail MCP**: claude.ai Connectors 経由で接続。OAuthクライアントはプロジェクト tamurakeito-fc9e7 に作成済み。
 
+## Email Safety Rules
+
+- メール送信ツール（`reply`, `send_message`, `send_mail`）は絶対に使わない。必ず下書き作成（`create_draft`, `save_draft`）を使う。
+- ユーザーが「送信して」と明示的に指示した場合でも、まず下書きを見せて確認を取る。
+- メール送信は取り消し不可能な操作であり、内容確認前の送信は重大なインシデントとなる。
+- 2026-08-26に支払基金への返信で `reply` を使い、ユーザー確認なしに直接送信してしまうインシデントが発生した。
+
 ## Email Writing Style
 
 田村さんのメール文体の特徴:
