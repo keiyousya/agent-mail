@@ -12,3 +12,5 @@
 - [ベースアップ評価料の中間報告書](project_baseup_report.md) — 8月中に東北厚生局へ提出、税理士の回答待ち
 - [クリニックの休診期間](project_clinic_closure.md) — 2026年8月26日から約3週間、田村さん不在
 - [クリニック取引先](reference_clinic_suppliers.md) — 東邦薬品中野、スズケン齋藤、丸木千葉、ダスキン吉田/高橋
+- [院内インカムの導入検討](project_clinic_intercom.md) — 調査済み・判断保留、まず無料トライアルで0円検証
+- [クリニックの電話契約](project_clinic_phone.md) — ひかり電話・基本プラン、2026-09-12にND＋着信お知らせメールを申込済み
