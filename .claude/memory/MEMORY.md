@@ -18,3 +18,4 @@
 - [行政窓口へのメール問い合わせ経路](reference_agency_inquiry_channels.md) — 仙台市・宮城県は課のアドレス非公開、厚生局はフォームの使い分け注意
 - [輪番情報の問い合わせ](project_rinban_info.md) — 救急事業団へ当番病院一覧の送付を依頼したいが、宛先未入手で未送信
 - [G-MIS・医療情報ネットのアカウント](reference_gmis_accounts.md) — ID/パスワードの在処、医療情報ネットの仮パスワードは放置でOK（SSOで入れる）
+- [メールの「要対応」は対応済みが多い](feedback_mail_followup.md) — 督促メールの文面だけで未対応と判定しない
