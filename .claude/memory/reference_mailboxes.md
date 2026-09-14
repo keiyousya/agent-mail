@@ -1,7 +1,11 @@
 ---
 name: reference_mailboxes
 description: 2つのメールボックスの使い分けと、さくらメールのフォルダ構成の癖。
-type: reference
+metadata: 
+  node_type: memory
+  type: reference
+  originSessionId: dad4486e-346b-4870-8cd4-f35fb08c060d
+  modified: 2026-09-14T05:49:31.253Z
 ---
 
 田村さんはメールボックスを2つ使い分けている。用件に応じて正しい方を使う。
@@ -10,6 +14,10 @@ type: reference
 - 勾当台夕方内科クリニック: さくらのメール。プロジェクトローカルのMCPサーバー
   `sakura-mail`（`apps/server/src/mcp.ts`）で操作する。認証情報はリポジトリ直下の
   `.env`（`IMAP_PASS` / `SMTP_PASS`、gitignore済み）。
+
+- iCloud（個人）: 2026-09-14追加。同じサーバーを `MAIL_ACCOUNT=icloud` で起動する
+  `icloud-mail`（`.mcp.json`）。`.env` の `ICLOUD_USER` / `ICLOUD_PASS`（App用パスワード）。
+  フォルダは `INBOX.` なしの `Sent Messages` / `Drafts` / `Deleted Messages` / `Junk`。
 
 クリニック宛の案件がGmailで見つからない場合、sakura-mail側を探す。逆も同様。
 
