@@ -1,15 +1,15 @@
 import nodemailer from "nodemailer";
-import { env } from "../env.js";
+import { account } from "../env.js";
 import type { ComposeRequest } from "../types/index.js";
 import { imapService } from "./imap.js";
 
 const transporter = nodemailer.createTransport({
-  host: env.SMTP_HOST,
-  port: env.SMTP_PORT,
+  host: account.smtp.host,
+  port: account.smtp.port,
   secure: false,
   auth: {
-    user: env.SMTP_USER,
-    pass: env.SMTP_PASS,
+    user: account.smtp.user,
+    pass: account.smtp.pass,
   },
   tls: {
     rejectUnauthorized: false,
@@ -58,7 +58,7 @@ export async function saveDraft(
 
 function buildMailOptions(request: ComposeRequest): Record<string, any> {
   return {
-    from: env.SMTP_USER,
+    from: account.smtp.user,
     to: request.to.join(", "),
     cc: request.cc?.join(", "),
     bcc: request.bcc?.join(", "),

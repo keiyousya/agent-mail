@@ -8,6 +8,17 @@
         "apps/server/src/mcp.ts"
       ],
       "env": {}
+    },
+    "icloud-mail": {
+      "type": "stdio",
+      "command": "node",
+      "args": [
+        "apps/server/node_modules/tsx/dist/cli.mjs",
+        "apps/server/src/mcp.ts"
+      ],
+      "env": {
+        "MAIL_ACCOUNT": "icloud"
+      }
     }
   }
 }

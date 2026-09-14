@@ -1,7 +1,7 @@
 import { ImapFlow } from "imapflow";
 import { simpleParser } from "mailparser";
 import sanitizeHtml from "sanitize-html";
-import { env } from "../env.js";
+import { account } from "../env.js";
 import type {
   Address,
   Mailbox,
@@ -53,12 +53,12 @@ export class ImapService {
     }
     if (!this.client) {
       const client = new ImapFlow({
-        host: env.IMAP_HOST,
-        port: env.IMAP_PORT,
+        host: account.imap.host,
+        port: account.imap.port,
         secure: true,
         auth: {
-          user: env.IMAP_USER,
-          pass: env.IMAP_PASS,
+          user: account.imap.user,
+          pass: account.imap.pass,
         },
         logger: false,
       });
@@ -138,7 +138,8 @@ export class ImapService {
       walk(tree.folders);
 
       // Fetch status for key folders (specialUse + well-known names)
-      const importantNames = ["INBOX", "INBOX.Sent Messages", "INBOX.Sent", "INBOX.Drafts", "INBOX.Draft", "INBOX.Deleted Messages", "INBOX.Trash", "INBOX.spam"];
+      const { sent, drafts, trash, junk } = account.folders;
+      const importantNames = ["INBOX", ...sent, ...drafts, ...trash, ...junk];
       const keyFolders = results.filter(
         (mb) => mb.specialUse || importantNames.includes(mb.path)
       );
@@ -326,7 +327,7 @@ export class ImapService {
           await client.messageDelete(String(uid), { uid: true });
         } else {
           try {
-            await client.messageMove(String(uid), "INBOX.Deleted Messages", { uid: true });
+            await client.messageMove(String(uid), account.folders.trash[0], { uid: true });
           } catch {
             await client.messageFlagsAdd(String(uid), ["\\Deleted"], { uid: true });
             await client.messageDelete(String(uid), { uid: true });
@@ -405,9 +406,7 @@ export class ImapService {
 
   async appendToSent(rawMessage: Buffer | string): Promise<void> {
     return this.enqueue(async (client) => {
-      // Try INBOX.Sent first (specialUse), then INBOX.Sent Messages
-      const sentFolders = ["INBOX.Sent Messages", "INBOX.Sent"];
-      for (const folder of sentFolders) {
+      for (const folder of account.folders.sent) {
         try {
           await client.append(folder, rawMessage, ["\\Seen"]);
           return;
@@ -421,8 +420,7 @@ export class ImapService {
 
   async appendToDrafts(rawMessage: Buffer | string): Promise<{ uid: number; folder: string } | null> {
     return this.enqueue(async (client) => {
-      const draftFolders = ["INBOX.Drafts", "INBOX.Draft"];
-      for (const folder of draftFolders) {
+      for (const folder of account.folders.drafts) {
         try {
           const result = await client.append(folder, rawMessage, ["\\Draft", "\\Seen"]);
           if (result && result.uid !== undefined) {

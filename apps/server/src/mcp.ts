@@ -3,11 +3,12 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { ImapService } from "./services/imap.js";
 import { sendMail, saveDraft } from "./services/smtp.js";
+import { account } from "./env.js";
 
 const imap = new ImapService();
 
 const server = new McpServer({
-  name: "sakura-mail",
+  name: `${account.name}-mail`,
   version: "1.0.0",
 });
 
