@@ -4,3 +4,4 @@ dist
 tsp-output
 *.tsbuildinfo
 .claude/settings.local.json
+.mcp.json
