@@ -26,6 +26,10 @@ user_invocable: true
 1. 上記3ファイルを Read で読み込む
 2. CLAUDE.md の「Email Writing Style」セクションも参照する
 3. 文体ルールに従って本文を作成する
-4. 返信の場合は本文末尾に元メールの引用ブロックを付ける（Apple Mail形式）
+4. **返信は必ず既存スレッドへの返信として作る**（新規メールにしない）
+   - `inReplyTo` に返信先メールの Message-ID をセット
+   - `references` にスレッド内の Message-ID を時系列順で入れる
+   - 本文末尾に元メールの引用ブロックを付ける（Apple Mail形式）
+   - CC は元スレッドの構成を踏襲する
 5. `save_draft` または `create_draft` で下書きを保存する
 6. **絶対に `send_mail` / `send_message` / `reply` は使わない**
